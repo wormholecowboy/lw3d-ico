@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ICryptoDevs.sol";
 
-contract CryptoDevsToken is ERC20, Ownable {
+contract CryptoDevToken is ERC20, Ownable {
     uint256 public constant tokenPrice = 0.001 ether;
     uint256 public constant tokensPerNFT = 10 * 10**18;
     uint256 public constant maxTotalSupply = 10000 * 10**18;
@@ -16,7 +16,7 @@ contract CryptoDevsToken is ERC20, Ownable {
         CryptoDevsNFT = ICryptoDevs(_cryptoDevsContract);
     }
 
-    function mint(int256 amount) public payable {
+    function mint(uint256 amount) public payable {
         uint256 _requiredAmount = tokenPrice * amount;
         require(msg.value >= _requiredAmount, "Ether sent is incorrect");
         uint256 amountWithDecimals = amount * 10**18; 
@@ -37,7 +37,7 @@ contract CryptoDevsToken is ERC20, Ownable {
                     // if not claimed, increment
                     if(!tokenIdsClaimed[tokenId]) {
                         amount += 1;
-                        tokenIdsClaimed[tokenID] = true;
+                        tokenIdsClaimed[tokenId] = true;
                     }
                 }
 
