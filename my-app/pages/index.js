@@ -59,5 +59,91 @@ export default function Home() {
       setTokensToBeClaimed(zero);
     }
   };
-  const getBalanceOfCryptoDevTokens = async () => {};
+  const getBalanceOfCryptoDevTokens = async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const tokenContract = new Contract(
+        TOKEN_CONTRACT_ADDRESS,
+        TOKEN_CONTRACT_ABI,
+        provider
+      );
+
+      const signer = await getProviderOrSigner(true);
+      const address = await signer.getAddress();
+      const balance = await tokenContract.balanceOf(address);
+
+      setBalanceOfCryptoDevTokens(balance);
+    } catch (err) {
+      console.error(err);
+      setBalanceOfCryptoDevTokens(zero);
+    }
+  };
+
+  const mintCryptoDevToken = async (amount) => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const tokenContract = new Contract(
+        TOKEN_CONTRACT_ADDRESS,
+        TOKEN_CONTRACT_ABI,
+        signer
+      );
+
+      const value = 0.001 * amount;
+      const tx = await tokenContract.mint(amount, {
+        value: utils.parseEther(value.toString()),
+      });
+
+      setLoading(true);
+      await tx.wait();
+      setLoading(false);
+      window.alert('You minted Crypto Dev Tokens!');
+
+      await getBalanceOfCryptoDevTokens();
+      await getTotalTokensMinted();
+      await getTokensToBeClaimed();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const claimCryptoDevTokens = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const tokenContract = new Contract(
+        TOKEN_CONTRACT_ADDRESS,
+        TOKEN_CONTRACT_ABI,
+        signer
+      );
+
+      const tx = await tokenContract.claim();
+      setLoading(true);
+      await tx.wait();
+      setLoading(false);
+      window.alert('You claimed Crypto Dev Tokens');
+
+      await getBalanceOfCryptoDevTokens();
+      await getTotalTokensMinted();
+      await getTokensToBeClaimed();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getTotalTokensMinted = async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const tokenContract = new Contract(
+        TOKEN_CONTRACT_ADDRESS,
+        TOKEN_CONTRACT_ABI,
+        provider
+      );
+
+      const _tokensMinted = await tokenContract.totalSupply();
+      setTokensMinted(_tokensMinted);
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  const getProviderOrSigner;
 }
