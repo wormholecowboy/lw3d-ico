@@ -47,9 +47,11 @@
   border: none;
   color: #ffffff;
   font-size: 15px;
-  padding: 5px;
-  width: 100px;
+  padding: 20px;
+  width: 180px;
   cursor: pointer;
+  display: block;
+  margin: auto auto;
   margin-bottom: 2%;
 }
 @media (max-width: 1000px) {
