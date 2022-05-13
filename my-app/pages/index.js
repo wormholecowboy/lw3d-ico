@@ -9,6 +9,7 @@ import {
   TOKEN_CONTRACT_ADDRESS,
 } from '../constants';
 import styles from '../styles/Home.module.css';
+import { Web3Provider } from '@ethersproject/providers';
 
 export default function Home() {
   const zero = BigNumber.from(0);
@@ -140,10 +141,91 @@ export default function Home() {
 
       const _tokensMinted = await tokenContract.totalSupply();
       setTokensMinted(_tokensMinted);
-    } catch(err) {
+    } catch (err) {
       console.error(err);
     }
-  }
+  };
 
-  const getProviderOrSigner;
+  const getProviderOrSigner = async (needSigner = false) => {
+    const provider = await web3ModalRef.current.connect();
+    const web3Provider = new providers.Web3Provider(provider);
+
+    const { chainId } = await Web3Provider.getNetwork();
+    if (chainId != 4) {
+      window.alert('Hey...you...yeah you...Ya gotta use Rinkeby. Ok?');
+      throw new Error('change the network to Rinkeby');
+    }
+
+    if (needSigner) {
+      const signer = await web3Provider.getSigner();
+      return signer;
+    }
+    return web3Provider;
+  };
+
+  const connectWallet = async () => {
+    try {
+      await getProviderOrSigner();
+      setWalletConnected(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!walletConnected) {
+      web3ModalRef.current = new Web3Modal({
+        network: 'rinkeby',
+        providerOptions: {},
+        disableInjectedProvider: false,
+      });
+      connectWallet();
+      getTotalTokensMinted();
+      getBalanceOfCryptoDevToken();
+      getTokensToBeClaimed();
+    }
+  }, [walletConnected]);
+
+  const renderButton = () => {
+    if (loading) {
+      return (
+        <div>
+          <button className={styles.button}>Loading...</button>
+        </div>
+      );
+    }
+    if (tokensToBeClaimed > 0) {
+      return (
+        <div>
+          <div className={styles.description}>
+            {tokensToBeClaimed * 10} Tokens can be claimed!
+          </div>
+          <button className={styles.button} onClick={claimCryptoDevTokens}>
+            Claim Tokens
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex-col' }}>
+        <div>
+          <input
+            type="number"
+            placeholder="Amount of Tokens"
+            onChange={(e) => setTokenAmount(BigNumber.from(e.target.value))}
+            className={styles.input}
+          />
+        </div>
+
+        <button
+          className={styles.button}
+          disabled={!(tokenAmount > 0)}
+          onClick={() => mintCryptoDevToken(tokenAmount)}
+        >
+          Mint Tokens
+        </button>
+      </div>
+    );
+  };
 }
