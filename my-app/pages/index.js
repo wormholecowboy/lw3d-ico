@@ -249,7 +249,7 @@ export default function Home() {
                 Crypto Dev Tokens
               </div>
               <div className={styles.description}>
-                Overall {utils.formatEther(tokensMinted_)}/10000 have been
+                Overall {utils.formatEther(tokensMinted)}/10000 have been
                 minted!!!
               </div>
               {renderButton()}
