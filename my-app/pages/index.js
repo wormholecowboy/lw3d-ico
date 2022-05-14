@@ -150,7 +150,7 @@ export default function Home() {
     const provider = await web3ModalRef.current.connect();
     const web3Provider = new providers.Web3Provider(provider);
 
-    const { chainId } = await Web3Provider.getNetwork();
+    const { chainId } = await web3Provider.getNetwork();
     if (chainId != 4) {
       window.alert('Hey...you...yeah you...Ya gotta use Rinkeby. Ok?');
       throw new Error('change the network to Rinkeby');
